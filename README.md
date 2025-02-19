@@ -2,8 +2,10 @@ A Windows XP-inspired portfolio website.
 
 ### Features
 
-- Resizable/Collapsible/Expandable/Closable File Explorer
+- Draggable/Resizable/Collapsible/Expandable/Closable File Explorer
 - Breadcrumbs and Deep Linking
+- Auto Updating Clock
+- Desktop Icons
 
 ### Credits
 
