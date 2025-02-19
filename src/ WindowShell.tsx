@@ -133,7 +133,7 @@ function ExplorerWindow({
       onClick={() => setActiveWindow(windowState.id)}
       className={`absolute ${
         active ? "" : "transition-transform duration-150"
-      } ${activeWindow === windowState.id ? "z-20" : "z-10 brightness-90"}`}
+      } ${activeWindow === windowState.id ? "z-20" : "z-10"}`}
       style={{ ...style, top, left, height: size.height, width: size.width }}
       {...attributes}
     >
@@ -161,7 +161,11 @@ function ExplorerWindow({
         }}
       >
         <div className="flex flex-col h-full">
-          <div className="h-8 flex items-center justify-between via-blue-700 px-1.5 text-white to-blue-500 bg-gradient-to-b from-blue-500 rounded-t-lg">
+          <div
+            className={`h-8 flex items-center justify-between via-blue-700 px-1.5 text-white to-blue-500 bg-gradient-to-b from-blue-500 rounded-t-lg ${
+              activeWindow !== windowState.id ? "brightness-125" : ""
+            }`}
+          >
             <div {...listeners} className="flex items-center flex-1">
               <div className="text-lg capitalize">
                 {windowState.title}

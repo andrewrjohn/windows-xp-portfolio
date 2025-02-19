@@ -10,7 +10,7 @@ interface Props {
 export function NotepadWindow(props: Props) {
   const { id } = props;
 
-  const { windows, setWindowTitle } = useAppContext();
+  const { windows } = useAppContext();
 
   const windowState = windows[id];
 
