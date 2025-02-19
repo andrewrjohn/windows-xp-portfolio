@@ -10,7 +10,7 @@ import MyComputerImage from "./assets/icons/my_computer.png";
 import FolderImage from "./assets/icons/folder.png";
 
 import { Link, Outlet, useLocation } from "react-router";
-import { useMinimized } from "./App";
+import { useMinimized } from "./context";
 
 export function FileExplorer() {
   const [coords, setCoords] = useState<{ left: number; top: number }>({
@@ -57,6 +57,7 @@ function ExplorerWindow({
 }) {
   const { minimized, setMinimized } = useMinimized();
 
+  const [showTools, setShowTools] = useState(false);
   const [size, setSize] = useState({ height: "480px", width: "680px" });
   const [lastSize, setLastSize] = useState({ height: "480px", width: "680px" });
   const [lastCoords, setLastCoords] = useState({ top: 0, left: 0 });
@@ -164,27 +165,57 @@ function ExplorerWindow({
                 onClick={() => setMinimized(true)}
                 className="cursor-pointer hover:brightness-90"
               >
-                <img src={MinimizeImage} className="size-5" />
+                <img src={MinimizeImage} className="size-5 select-none" />
               </button>
               <button
                 onClick={onMaximize}
                 className="cursor-pointer hover:brightness-90"
               >
-                <img src={MaximizeImage} className="size-5" />
+                <img src={MaximizeImage} className="size-5 select-none" />
               </button>
               <Link to="/closed" className="cursor-pointer hover:brightness-90">
-                <img src={ExitImage} className="size-5" />
+                <img src={ExitImage} className="size-5 select-none" />
               </Link>
             </div>
           </div>
           <div className="bg-white flex flex-col flex-1 border-4 border-t-0 border-blue-700">
-            <div className="flex items-center gap-3 px-2 bg-gray-200 border-b border-gray-300">
-              <div className="first-letter:underline">File</div>
-              <div className="first-letter:underline">Edit</div>
-              <div className="first-letter:underline">View</div>
-              <div className="first-letter:underline">Favorites</div>
-              <div className="first-letter:underline">Tools</div>
-              <div className="first-letter:underline">Help</div>
+            <div className="flex items-center px-2 bg-gray-200 border-b border-gray-300">
+              <div className="first-letter:underline pr-2 opacity-40">File</div>
+              <div className="first-letter:underline px-2 opacity-40">Edit</div>
+              <div className="first-letter:underline px-2 opacity-40">View</div>
+              <div className="first-letter:underline px-2 opacity-40">
+                Favorites
+              </div>
+              <div className="relative">
+                <div
+                  onClick={() => setShowTools(!showTools)}
+                  className={`first-letter:underline px-2 cursor-pointer ${
+                    showTools ? "text-white bg-blue-800" : ""
+                  }`}
+                >
+                  Tools
+                </div>
+                {showTools && (
+                  <div className="absolute top-full divide-y divide-gray-300 border border-gray-300 left-0 bg-white">
+                    {[
+                      "JavaScript/TypeScript",
+                      "Node JS",
+                      "React",
+                      "Next JS",
+                      "Tailwind CSS",
+                      "Rust",
+                    ].map((tool) => (
+                      <div
+                        key={tool}
+                        className="px-4  hover:bg-blue-800 hover:text-white"
+                      >
+                        {tool}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="first-letter:underline px-2 opacity-40">Help</div>
             </div>
             <div className="bg-gray-200 border-b pt-2 px-1.5 border-gray-300">
               <Link to="/" className="inline-flex items-center gap-1.5">
@@ -215,20 +246,20 @@ function ExplorerWindow({
                     to="/"
                     className="flex items-center gap-1 leading-tight"
                   >
-                    <img src={MyComputerImage} className="size-4" />
+                    <img src={MyComputerImage} className="size-4 select-none" />
                     My Computer
                   </Link>
                   <div className="flex flex-col items-start leading-tight ml-4">
                     <Link to="/about" className="flex items-center gap-1">
-                      <img src={FolderImage} className="size-4" />
+                      <img src={FolderImage} className="size-4 select-none" />
                       About
                     </Link>
                     <Link to="/projects" className="flex items-center gap-1">
-                      <img src={FolderImage} className="size-4" />
+                      <img src={FolderImage} className="size-4 select-none" />
                       Projects
                     </Link>
                     <Link to="/contact" className="flex items-center gap-1">
-                      <img src={FolderImage} className="size-4" />
+                      <img src={FolderImage} className="size-4 select-none" />
                       Contact
                     </Link>
                   </div>
