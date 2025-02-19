@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Tahoma XP";
+  src: url("/fonts/windows-xp-tahoma.ttf");
+}
+
+@theme {
+  --font-sans: "Tahoma XP", Tahoma;
+}
