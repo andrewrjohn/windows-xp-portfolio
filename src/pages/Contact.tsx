@@ -7,7 +7,10 @@ export function ContactPage() {
     <ExplorerGrid>
       <Item name="Email" href="mailto:andrewj@hey.com" image={EmailImage} />
       <Item name="GitHub" href="https://github.com/andrewrjohn" />
-      <Item name="LinkedIn" href="https://linkedin.com" />
+      <Item
+        name="LinkedIn"
+        href="https://www.linkedin.com/in/andrew-johnson-21031378/"
+      />
     </ExplorerGrid>
   );
 }

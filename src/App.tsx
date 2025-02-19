@@ -14,6 +14,7 @@ import XPImage from "./assets/icons/xp.png";
 import LocalDiskImage from "./assets/icons/local_disk.png";
 import MyComputerImage from "./assets/icons/my_computer.png";
 import { createContext, useContext, useState } from "react";
+import { AboutPage } from "./pages/About";
 
 const MinimizedContext = createContext<{
   minimized: boolean;
@@ -39,6 +40,7 @@ export function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
           <Route path="/closed" element={null} />
