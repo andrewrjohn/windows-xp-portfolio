@@ -1,6 +1,10 @@
-Portfolio website that looks like a desktop environment.
+A Windows XP-inspired portfolio website.
 
-### Checklist
+### Features
 
-- [ ] General Layout UI
-- [ ] Draggable and resizable file explorer
+- Resizable/Collapsible/Expandable/Closable File Explorer
+- Breadcrumbs and Deep Linking
+
+### Credits
+
+- [High Res Windows XP Icons](https://github.com/marchmountain/-Windows-XP-High-Resolution-Icon-Pack/tree/01)
