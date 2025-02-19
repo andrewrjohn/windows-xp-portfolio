@@ -1,6 +1,6 @@
-import NetworkImage from "../assets/icons/network.png";
-import EmailImage from "../assets/icons/email.png";
-import { ExplorerGrid } from "../ExplorerGrid";
+import NetworkImage from "../../../assets/icons/network.png";
+import EmailImage from "../../../assets/icons/email.png";
+import { ExplorerGrid } from "../../../ExplorerGrid";
 
 export function ContactPage() {
   return (

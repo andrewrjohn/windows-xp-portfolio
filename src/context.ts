@@ -1,14 +1,36 @@
 import { createContext, useContext } from "react";
 
-export const MinimizedContext = createContext<{
+export type Window = {
+  id: number;
   minimized: boolean;
-  setMinimized: (minimized: boolean) => void;
-}>({
-  minimized: false,
-  setMinimized: () => {},
+  fullScreen: boolean;
+  title: string;
+  application: "file_explorer" | "notepad";
+  icon: string;
+};
+
+export type AppContext = {
+  windows: Record<number, Window>;
+  activeWindow: number;
+  setActiveWindow: (id: number) => void;
+  setWindowTitle: (id: number, title: string) => void;
+  addWindow: (window: Window) => void;
+  closeWindow: (id: number) => void;
+  setWindowFullScreen: (id: number, fullScreen: boolean) => void;
+  setWindowMinimized: (id: number, minimized: boolean) => void;
+};
+
+export const AppContext = createContext<AppContext>({
+  windows: {},
+  activeWindow: 0,
+  addWindow: () => {},
+  closeWindow: () => {},
+  setWindowFullScreen: () => {},
+  setWindowMinimized: () => {},
+  setActiveWindow: () => {},
+  setWindowTitle: () => {},
 });
 
-export const useMinimized = () => {
-  const { minimized, setMinimized } = useContext(MinimizedContext);
-  return { minimized, setMinimized };
+export const useAppContext = () => {
+  return useContext(AppContext);
 };

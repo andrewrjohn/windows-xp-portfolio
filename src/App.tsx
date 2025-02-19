@@ -1,34 +1,62 @@
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-} from "react-router";
-import { FileExplorer } from "./FileExplorer";
-import { HomePage } from "./pages/Home";
-import { ProjectsPage } from "./pages/Projects";
-import { NotFoundPage } from "./pages/NotFound";
-import { ContactPage } from "./pages/Contact";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import XPImage from "./assets/icons/xp.png";
 import LocalDiskImage from "./assets/icons/local_disk.png";
 import MyComputerImage from "./assets/icons/my_computer.png";
 import UrlImage from "./assets/icons/url.png";
 import VolumeImage from "./assets/icons/volume.png";
 import RecycleBinImage from "./assets/icons/recycle_bin.png";
-
+import NotepadImage from "./assets/icons/notepad.png";
 import { useEffect, useState } from "react";
-import { AboutPage } from "./pages/About";
-import { MinimizedContext, useMinimized } from "./context";
+import { AppContext, useAppContext, Window } from "./context";
+import { DynamicWindow } from "./DynamicWindow";
 
 export function App() {
-  const [minimized, setMinimized] = useState(false);
+  const [activeWindow, setActiveWindow] = useState(0);
+  const [windows, setWindows] = useState<Record<number, Window>>({});
+
+  const addWindow = (window: Window) => {
+    setWindows({ ...windows, [window.id]: window });
+    setActiveWindow(window.id);
+  };
+
+  const closeWindow = (id: number) => {
+    const newWindows = { ...windows };
+    delete newWindows[id];
+    setWindows(newWindows);
+  };
+
+  const setWindowFullScreen = (id: number, fullScreen: boolean) => {
+    setWindows({ ...windows, [id]: { ...windows[id], fullScreen } });
+  };
+
+  const setWindowMinimized = (id: number, minimized: boolean) => {
+    setWindows({ ...windows, [id]: { ...windows[id], minimized } });
+
+    if (minimized) {
+      setActiveWindow(0);
+    }
+  };
+
+  const setWindowTitle = (id: number, title: string) => {
+    setWindows({ ...windows, [id]: { ...windows[id], title } });
+  };
 
   return (
-    <MinimizedContext.Provider value={{ minimized, setMinimized }}>
+    <AppContext.Provider
+      value={{
+        activeWindow,
+        setActiveWindow,
+        addWindow,
+        closeWindow,
+        windows,
+        setWindowFullScreen,
+        setWindowMinimized,
+        setWindowTitle,
+      }}
+    >
       <BrowserRouter>
         <div className="hidden md:block">
-          <Routes>
+          {/* <Routes>
             <Route element={<FileExplorer />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/projects" element={<ProjectsPage />} />
@@ -37,7 +65,10 @@ export function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Route>
             <Route path="/closed" element={null} />
-          </Routes>
+          </Routes> */}
+          {Object.values(windows).map((w) => (
+            <DynamicWindow key={w.id} id={w.id} windowState={w} />
+          ))}
         </div>
         <div className="md:hidden">
           <Routes>
@@ -60,17 +91,24 @@ export function App() {
         </div>
         <Layout />
       </BrowserRouter>
-    </MinimizedContext.Provider>
+    </AppContext.Provider>
   );
 }
 
 function Layout() {
-  const { minimized, setMinimized } = useMinimized();
   const { pathname } = useLocation();
-  const [activeIcon, setActiveIcon] = useState("my_computer");
+  const [activeIcon, setActiveIcon] = useState("");
   const [time, setTime] = useState(
     new Date().toLocaleTimeString(undefined, { timeStyle: "short" })
   );
+
+  const {
+    windows,
+    setWindowMinimized,
+    addWindow,
+    activeWindow,
+    setActiveWindow,
+  } = useAppContext();
 
   useEffect(() => {
     const updateTime = () => {
@@ -81,8 +119,6 @@ function Layout() {
 
     return () => clearInterval(interval);
   }, []);
-
-  const navigate = useNavigate();
 
   const explorerClosed = pathname === "/closed";
   return (
@@ -105,7 +141,33 @@ function Layout() {
             icon={MyComputerImage}
             title="My Computer"
             onClick={() => {
-              navigate("/");
+              addWindow({
+                id: +new Date(),
+                minimized: false,
+                fullScreen: false,
+                title: "My Computer",
+                application: "file_explorer",
+                icon: LocalDiskImage,
+              });
+            }}
+          />
+        </div>
+        <div className="hidden md:block">
+          <DesktopIcon
+            id="notepad"
+            activeIcon={activeIcon}
+            setActiveIcon={setActiveIcon}
+            icon={NotepadImage}
+            title="Notepad"
+            onClick={() => {
+              addWindow({
+                id: +new Date(),
+                minimized: false,
+                fullScreen: false,
+                title: "Notepad",
+                application: "notepad",
+                icon: NotepadImage,
+              });
             }}
           />
         </div>
@@ -139,18 +201,28 @@ function Layout() {
           start
         </div>
         {explorerClosed ? null : (
-          <div className="ml-3 py-px items-center  hidden md:flex">
-            <button
-              onClick={() => setMinimized(!minimized)}
-              className={`flex items-center cursor-pointer gap-1 px-1.5 rounded-sm text-lg pr-12 tracking-wide ${
-                minimized
-                  ? "from-blue-400 via-blue-500 to-blue-400 bg-gradient-to-b"
-                  : "bg-blue-800 border border-blue-900 inset-shadow-2x shadow-2xl shadow-black inset-shadow-black"
-              }`}
-            >
-              <img src={LocalDiskImage} className="size-5" />
-              Local Disk (C:)
-            </button>
+          <div className="ml-3 py-px items-center gap-1 hidden md:flex">
+            {Object.values(windows).map((w) => (
+              <button
+                key={w.id}
+                onClick={() => {
+                  if (activeWindow === w.id) {
+                    setWindowMinimized(w.id, !w.minimized);
+                  } else {
+                    setWindowMinimized(w.id, false);
+                    setActiveWindow(w.id);
+                  }
+                }}
+                className={`flex items-center cursor-pointer capitalize gap-1 px-1.5 rounded-sm text-lg pr-12 tracking-wide ${
+                  w.minimized || activeWindow !== w.id
+                    ? "from-blue-400 via-blue-500 to-blue-400 bg-gradient-to-b"
+                    : "bg-blue-800 border border-blue-900 inset-shadow-2x shadow-2xl shadow-black inset-shadow-black"
+                }`}
+              >
+                <img src={w.icon} className="size-5" />
+                {w.title}
+              </button>
+            ))}
           </div>
         )}
         <div className="flex-1" />
