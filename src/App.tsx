@@ -69,13 +69,33 @@ export function App() {
     }
   };
 
-  const setWindowTitle = (
+  const updateWindow = (
     id: number,
-    title: string | ((title: string) => string)
+    options: {
+      title?: string | ((title: string) => string);
+      icon?: string;
+    }
   ) => {
-    const existingTitle = windows[id].title;
-    const newTitle = typeof title === "string" ? title : title(existingTitle);
-    setWindows({ ...windows, [id]: { ...windows[id], title: newTitle } });
+    const existingWindow = windows[id];
+
+    const { title, icon } = options;
+
+    let newTitle = existingWindow.title;
+    let newIcon = existingWindow.icon;
+
+    if (title) {
+      newTitle =
+        typeof title === "string" ? title : title(existingWindow.title);
+    }
+
+    if (icon) {
+      newIcon = icon;
+    }
+
+    setWindows({
+      ...windows,
+      [id]: { ...windows[id], title: newTitle, icon: newIcon },
+    });
   };
 
   return (
@@ -88,7 +108,7 @@ export function App() {
         windows,
         setWindowFullScreen,
         setWindowMinimized,
-        setWindowTitle,
+        updateWindow,
       }}
     >
       <div className="hidden sm:block">
@@ -210,7 +230,14 @@ function Desktop() {
           setActiveIcon={setActiveIcon}
           icon={RecycleBinImage}
           title="Recycle Bin"
-          onClick={() => {}}
+          onClick={() => {
+            addWindow({
+              application: "file_explorer",
+              path: "recycle bin",
+              title: "Recycle Bin",
+              icon: RecycleBinImage,
+            });
+          }}
         />
       </div>
 

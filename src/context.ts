@@ -2,6 +2,13 @@ import { createContext, useContext } from "react";
 
 export type Application = Window["application"];
 
+export type FileExplorerPath =
+  | "about"
+  | "projects"
+  | "contact"
+  | "recycle bin"
+  | "";
+
 type BaseWindow = {
   id: number;
   minimized: boolean;
@@ -12,6 +19,7 @@ type BaseWindow = {
 
 type FileExplorerWindow = BaseWindow & {
   application: "file_explorer";
+  path?: FileExplorerPath;
 };
 
 type NotepadWindow = BaseWindow & {
@@ -27,25 +35,36 @@ type BaseNewWindow = {
   title?: string;
 };
 
+type NewFileExplorerWindow = BaseNewWindow & {
+  application: "file_explorer";
+  path?: FileExplorerPath;
+};
+
 type NewNotepadWindow = BaseNewWindow & {
   application: "notepad";
   defaultText?: string;
 };
 
-export type NewWindow = BaseNewWindow | NewNotepadWindow;
+export type NewWindow =
+  | BaseNewWindow
+  | NewNotepadWindow
+  | NewFileExplorerWindow;
 
 export type AppContext = {
   windows: Record<number, Window>;
   activeWindow: number;
   setActiveWindow: (id: number) => void;
-  setWindowTitle: (
-    id: number,
-    title: string | ((title: string) => string)
-  ) => void;
   addWindow: (window: NewWindow) => number;
   closeWindow: (id: number) => void;
   setWindowFullScreen: (id: number, fullScreen: boolean) => void;
   setWindowMinimized: (id: number, minimized: boolean) => void;
+  updateWindow: (
+    id: number,
+    options: {
+      title?: string | ((title: string) => string);
+      icon?: string;
+    }
+  ) => void;
 };
 
 export const AppContext = createContext<AppContext>({
@@ -55,8 +74,8 @@ export const AppContext = createContext<AppContext>({
   closeWindow: () => {},
   setWindowFullScreen: () => {},
   setWindowMinimized: () => {},
+  updateWindow: () => {},
   setActiveWindow: () => {},
-  setWindowTitle: () => {},
 });
 
 export const useAppContext = () => {

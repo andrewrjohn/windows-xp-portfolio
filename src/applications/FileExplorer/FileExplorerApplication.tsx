@@ -4,7 +4,7 @@ import LocalDiskImage from "../../assets/icons/local_disk.png";
 import MyComputerImage from "../../assets/icons/my_computer.png";
 import FolderImage from "../../assets/icons/folder.png";
 
-import { useAppContext } from "../../context";
+import { FileExplorerPath, useAppContext } from "../../context";
 import { WindowShell } from "../../components/ WindowShell";
 import { AboutPage } from "./views/About";
 import { ProjectsPage } from "./views/Projects";
@@ -12,9 +12,8 @@ import { ContactPage } from "./views/Contact";
 import { HomePage } from "./views/Home";
 import { Menu } from "../../components/Menu";
 import { capitalize } from "../../helpers";
-
-export type FileExplorerPath = "about" | "projects" | "contact" | "";
-
+import { RecycleBin } from "./views/RecycleBin";
+import RecycleBinImage from "../../assets/icons/recycle_bin.png";
 interface Props {
   id: number;
 }
@@ -22,15 +21,14 @@ interface Props {
 export function FileExplorerApplication(props: Props) {
   const { id } = props;
 
-  const { windows, setWindowTitle, addWindow, setActiveWindow } =
-    useAppContext();
+  const { windows, addWindow, setActiveWindow, updateWindow } = useAppContext();
 
   const windowState = windows[id];
 
   if (!windowState || windowState.application !== "file_explorer")
     throw Error("Missing or invalid window application type not found");
 
-  const [path, setPath] = useState<FileExplorerPath>("");
+  const [path, setPath] = useState<FileExplorerPath>(windowState.path || "");
 
   const newWindow = () => {
     const id = addWindow({ application: "file_explorer" });
@@ -39,7 +37,14 @@ export function FileExplorerApplication(props: Props) {
   };
 
   useEffect(() => {
-    setWindowTitle(id, path ? `C:\\ ${capitalize(path)}` : "My Computer");
+    updateWindow(id, {
+      title: path
+        ? path === "recycle bin"
+          ? "Recycle Bin"
+          : `C:\\ ${capitalize(path)}`
+        : "My Computer",
+      icon: path === "recycle bin" ? RecycleBinImage : LocalDiskImage,
+    });
   }, [path, id]);
 
   return (
@@ -84,13 +89,15 @@ export function FileExplorerApplication(props: Props) {
         <div className="bg-yellow-50 border-b px-1.5 border-gray-300 leading-snug flex items-center py-px gap-1">
           <div className="opacity-40 first-letter:underline">Address</div>
           <div className="bg-white border border-gray-400 flex-1 h-full px-1 flex items-center gap-0.5">
-            <button
-              onClick={() => setPath("")}
-              className="inline-flex items-center gap-1 cursor-pointer"
-            >
-              <img src={LocalDiskImage} className="size-4" />
-              <div className="text-sm tracking-widest">C:\</div>
-            </button>
+            {path !== "recycle bin" ? (
+              <button
+                onClick={() => setPath("")}
+                className="inline-flex items-center gap-1 cursor-pointer"
+              >
+                <img src={LocalDiskImage} className="size-4" />
+                <div className="text-sm tracking-widest">C:\</div>
+              </button>
+            ) : null}
             {path ? (
               <button
                 onClick={() => setPath(path)}
@@ -136,6 +143,13 @@ export function FileExplorerApplication(props: Props) {
                   setPath={setPath}
                 />
               </div>
+              <button
+                onClick={() => setPath("recycle bin")}
+                className="flex items-center gap-1 cursor-pointer leading-tight"
+              >
+                <img src={RecycleBinImage} className="size-4 select-none" />
+                Recycle Bin
+              </button>
             </div>
           </div>
 
@@ -190,6 +204,8 @@ function Content({
       return <ProjectsPage />;
     case "contact":
       return <ContactPage />;
+    case "recycle bin":
+      return <RecycleBin />;
     default:
       return <HomePage setPath={setPath} />;
   }

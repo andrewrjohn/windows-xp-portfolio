@@ -11,7 +11,7 @@ interface Props {
 export function NotepadApplication(props: Props) {
   const { id } = props;
 
-  const { windows, closeWindow, addWindow, setWindowTitle, setActiveWindow } =
+  const { windows, closeWindow, addWindow, setActiveWindow, updateWindow } =
     useAppContext();
 
   const windowState = windows[id];
@@ -160,7 +160,7 @@ export function NotepadApplication(props: Props) {
     if (text !== defaultText) {
       setIsUnsaved(true);
 
-      setWindowTitle(id, (title) => `${title} *`);
+      updateWindow(id, { title: (title) => `${title} *` });
     }
   }, [text]);
 

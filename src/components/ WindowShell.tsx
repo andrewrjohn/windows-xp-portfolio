@@ -18,11 +18,18 @@ export function WindowShell(props: Props) {
 
   const windowState = windows[id];
 
+  const windowIdx = useMemo(() => {
+    return Object.values(windows).findIndex((w) => w.id === id);
+  }, [windows, id]);
+
   if (!windowState) throw new Error("Window not found");
 
+  const leftOffset = windowIdx * 20;
+  const topOffset = windowIdx * 20;
+
   const [coords, setCoords] = useState<{ left: number; top: number }>({
-    left: 100,
-    top: 100,
+    left: 100 + leftOffset,
+    top: 100 + topOffset,
   });
 
   return (

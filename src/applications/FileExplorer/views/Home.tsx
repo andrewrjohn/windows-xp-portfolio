@@ -1,6 +1,6 @@
 import FolderImage from "../../../assets/icons/folder.png";
 import { FileGrid } from "../../../components/FileGrid";
-import { FileExplorerPath } from "../FileExplorerApplication";
+import { FileExplorerPath } from "../../../context";
 
 interface Props {
   setPath: (path: FileExplorerPath) => void;
