@@ -22,7 +22,8 @@ interface Props {
 export function FileExplorerApplication(props: Props) {
   const { id } = props;
 
-  const { windows, setWindowTitle } = useAppContext();
+  const { windows, setWindowTitle, addWindow, setActiveWindow } =
+    useAppContext();
 
   const windowState = windows[id];
 
@@ -31,6 +32,12 @@ export function FileExplorerApplication(props: Props) {
 
   const [path, setPath] = useState<FileExplorerPath>("");
 
+  const newWindow = () => {
+    const id = addWindow({ application: "file_explorer" });
+
+    setActiveWindow(id);
+  };
+
   useEffect(() => {
     setWindowTitle(id, path ? `C:\\ ${capitalize(path)}` : "My Computer");
   }, [path, id]);
@@ -38,8 +45,16 @@ export function FileExplorerApplication(props: Props) {
   return (
     <WindowShell id={id}>
       <div className="bg-white flex flex-col flex-1 border-4 border-t-0 border-blue-700">
-        <div className="flex items-center px-2 bg-yellow-50 border-b leading-tight border-gray-300">
-          <div className="first-letter:underline pr-2 opacity-40">File</div>
+        <div className="flex items-center bg-yellow-50 border-b leading-tight border-gray-300">
+          <Menu
+            trigger={(props) => <button {...props}>File</button>}
+            items={[
+              {
+                label: "New",
+                onClick: newWindow,
+              },
+            ]}
+          />
           <div className="first-letter:underline px-2 opacity-40">Edit</div>
           <div className="first-letter:underline px-2 opacity-40">View</div>
           <div className="first-letter:underline px-2 opacity-40">
