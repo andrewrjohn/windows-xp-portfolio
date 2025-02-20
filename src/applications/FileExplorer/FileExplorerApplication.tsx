@@ -5,7 +5,7 @@ import MyComputerImage from "../../assets/icons/my_computer.png";
 import FolderImage from "../../assets/icons/folder.png";
 
 import { FileExplorerPath, useAppContext } from "../../context";
-import { WindowShell } from "../../components/ WindowShell";
+import { WindowShell } from "../../components/WindowShell";
 import { AboutPage } from "./views/About";
 import { ProjectsPage } from "./views/Projects";
 import { ContactPage } from "./views/Contact";

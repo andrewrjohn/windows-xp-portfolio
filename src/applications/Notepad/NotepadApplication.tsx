@@ -1,4 +1,4 @@
-import { WindowShell } from "../../components/ WindowShell";
+import { WindowShell } from "../../components/WindowShell";
 import { useAppContext } from "../../context";
 import { Menu } from "../../components/Menu";
 import { useHotkey } from "../../hooks/useHotkey";
