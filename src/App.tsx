@@ -7,7 +7,7 @@ import RecycleBinImage from "./assets/icons/recycle_bin.png";
 import NotepadImage from "./assets/icons/notepad.png";
 import TxtImage from "./assets/icons/txt.png";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AppContext,
   Application,
@@ -157,9 +157,63 @@ function Desktop() {
     return () => clearInterval(interval);
   }, []);
 
+  const mouseDownRef = useRef(false);
+  const [dragStartPos, setDragStartPos] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [dragEndPos, setDragEndPos] = useState<{ x: number; y: number } | null>(
+    null
+  );
+
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      mouseDownRef.current = true;
+      setDragStartPos({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleMouseUp = () => {
+      mouseDownRef.current = false;
+
+      setDragStartPos(null);
+      setDragEndPos(null);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (mouseDownRef.current) {
+        setDragEndPos({ x: e.clientX, y: e.clientY });
+      }
+    };
+
+    const wallpaper = document.querySelector<HTMLDivElement>("#wallpaper");
+
+    if (!wallpaper) return;
+
+    wallpaper.addEventListener("mousedown", handleMouseDown);
+    wallpaper.addEventListener("mouseup", handleMouseUp);
+    wallpaper.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      wallpaper.removeEventListener("mousedown", handleMouseDown);
+      wallpaper.removeEventListener("mouseup", handleMouseUp);
+      wallpaper.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  const dragBoxWidth = Math.abs(
+    dragStartPos && dragEndPos ? dragEndPos.x - dragStartPos.x : 0
+  );
+
+  const dragBoxHeight = Math.abs(
+    dragStartPos && dragEndPos ? dragEndPos.y - dragStartPos.y : 0
+  );
+
+  const draggingLeftToRight = (dragEndPos?.x ?? 0) > (dragStartPos?.x ?? 0);
+  const draggingTopToBottom = (dragEndPos?.y ?? 0) > (dragStartPos?.y ?? 0);
+
   return (
     <div
-      className="h-screen w-full flex flex-col bg-[url(/background.jpg)] bg-no-repeat overflow-hidden"
+      className="h-screen w-full flex flex-col bg-[url(/background.jpg)] bg-no-repeat overflow-hidden select-none"
       onClick={(e) => {
         // @ts-expect-error sad
         if (e.target.id !== "desktop-icon") {
@@ -167,7 +221,26 @@ function Desktop() {
         }
       }}
       style={{ backgroundSize: "100% 100%" }}
+      id="wallpaper"
     >
+      {dragBoxHeight && dragBoxWidth ? (
+        <div
+          style={{
+            height: `${dragBoxHeight}px`,
+            width: `${dragBoxWidth}px`,
+            position: "absolute",
+            top: dragStartPos?.y,
+            left: dragStartPos?.x,
+            transform:
+              !draggingLeftToRight || !draggingTopToBottom
+                ? `translate(${!draggingLeftToRight ? "-100%" : "0px"}, ${
+                    !draggingTopToBottom ? "-100%" : "0px"
+                  })`
+                : undefined,
+          }}
+          className="bg-blue-400/50"
+        />
+      ) : null}
       <div className="flex items-center flex-wrap gap-4">
         <div className="hidden sm:block">
           <DesktopIcon
