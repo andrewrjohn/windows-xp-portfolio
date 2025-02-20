@@ -89,16 +89,21 @@ export function FileExplorerApplication(props: Props) {
         <div className="bg-yellow-50 border-b px-1.5 border-gray-300 leading-snug flex items-center py-px gap-1">
           <div className="opacity-40 first-letter:underline">Address</div>
           <div className="bg-white border border-gray-400 flex-1 h-full px-1 flex items-center gap-0.5">
+            <button
+              onClick={() =>
+                setPath(path === "recycle bin" ? "recycle bin" : "")
+              }
+              className="inline-flex items-center gap-1 cursor-pointer"
+            >
+              <img
+                src={path === "recycle bin" ? RecycleBinImage : LocalDiskImage}
+                className="size-4"
+              />
+              <div className="text-sm tracking-widest">
+                {path === "recycle bin" ? "Recycle Bin" : "C:\\"}
+              </div>
+            </button>
             {path !== "recycle bin" ? (
-              <button
-                onClick={() => setPath("")}
-                className="inline-flex items-center gap-1 cursor-pointer"
-              >
-                <img src={LocalDiskImage} className="size-4" />
-                <div className="text-sm tracking-widest">C:\</div>
-              </button>
-            ) : null}
-            {path ? (
               <button
                 onClick={() => setPath(path)}
                 className="capitalize cursor-pointer"
