@@ -1,17 +1,17 @@
 import NetworkImage from "../../../assets/icons/network.png";
 import EmailImage from "../../../assets/icons/email.png";
-import { ExplorerGrid } from "../../../ExplorerGrid";
+import { FileGrid } from "../../../components/FileGrid";
 
 export function ContactPage() {
   return (
-    <ExplorerGrid>
+    <FileGrid>
       <Item name="Email" href="mailto:andrewj@hey.com" image={EmailImage} />
       <Item name="GitHub" href="https://github.com/andrewrjohn" />
       <Item
         name="LinkedIn"
         href="https://www.linkedin.com/in/andrew-johnson-21031378/"
       />
-    </ExplorerGrid>
+    </FileGrid>
   );
 }
 

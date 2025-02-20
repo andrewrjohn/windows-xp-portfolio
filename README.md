@@ -1,11 +1,15 @@
-A Windows XP-inspired portfolio website.
+A Windows XP-inspired portfolio website that has too many features.
 
 ### Features
 
-- Draggable/Resizable/Collapsible/Expandable/Closable File Explorer
-- Breadcrumbs and Deep Linking
-- Auto Updating Clock
-- Desktop Icons
+- Dynamic application/window manager
+  - Draggable/resizable/collapsible/expandable/closable
+- Auto updating clock
+- File explorer (for static content)
+- Notepad
+  - File menu
+  - Edit menu
+  - Hotkeys
 
 ### Credits
 

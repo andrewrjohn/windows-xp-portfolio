@@ -5,6 +5,12 @@
   src: url("/fonts/windows-xp-tahoma.ttf");
 }
 
+@font-face {
+  font-family: "Lucida Console";
+  src: url("/fonts/lucida-console.ttf");
+}
+
 @theme {
   --font-sans: "Tahoma XP", Tahoma;
+  --font-notepad: "Lucida Console", monospace;
 }

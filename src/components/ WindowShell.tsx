@@ -1,10 +1,10 @@
 import { DndContext, useDraggable } from "@dnd-kit/core";
 import { Resizable } from "re-resizable";
 import { useMemo, useState } from "react";
-import ExitImage from "./assets/icons/exit.png";
-import MaximizeImage from "./assets/icons/maximize.png";
-import MinimizeImage from "./assets/icons/minimize.png";
-import { useAppContext, type Window } from "./context";
+import ExitImage from "../assets/icons/exit.png";
+import MaximizeImage from "../assets/icons/maximize.png";
+import MinimizeImage from "../assets/icons/minimize.png";
+import { useAppContext, type Window } from "../context";
 
 interface Props {
   id: number;
@@ -167,13 +167,9 @@ function ExplorerWindow({
             }`}
           >
             <div {...listeners} className="flex items-center flex-1">
-              <div className="text-lg capitalize">
+              <div className="text-lg flex items-center gap-1">
+                <img src={windowState.icon} className="size-5" />
                 {windowState.title}
-                {/* {path ? (
-                  <span className="capitalize">{path}</span>
-                ) : (
-                  "Local Disk (C:)"
-                )} */}
               </div>
             </div>
             <div className="flex items-center gap-0.5 text-sm">

@@ -1,4 +1,3 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import XPImage from "./assets/icons/xp.png";
 import LocalDiskImage from "./assets/icons/local_disk.png";
 import MyComputerImage from "./assets/icons/my_computer.png";
@@ -6,17 +5,50 @@ import UrlImage from "./assets/icons/url.png";
 import VolumeImage from "./assets/icons/volume.png";
 import RecycleBinImage from "./assets/icons/recycle_bin.png";
 import NotepadImage from "./assets/icons/notepad.png";
+import TxtImage from "./assets/icons/txt.png";
+
 import { useEffect, useState } from "react";
-import { AppContext, useAppContext, Window } from "./context";
-import { DynamicWindow } from "./DynamicWindow";
+import {
+  AppContext,
+  Application,
+  NewWindow,
+  useAppContext,
+  Window,
+} from "./context";
+import { DynamicWindow } from "./components/DynamicWindow";
+
+type ApplicationDefault = Pick<Window, "icon" | "title">;
+
+const APPLICATION_DEFAULTS: Record<Application, ApplicationDefault> = {
+  file_explorer: {
+    icon: LocalDiskImage,
+    title: "My Computer",
+  },
+  notepad: {
+    icon: NotepadImage,
+    title: "Untitled - Notepad",
+  },
+};
 
 export function App() {
   const [activeWindow, setActiveWindow] = useState(0);
   const [windows, setWindows] = useState<Record<number, Window>>({});
 
-  const addWindow = (window: Window) => {
-    setWindows({ ...windows, [window.id]: window });
-    setActiveWindow(window.id);
+  const addWindow = (window: NewWindow) => {
+    const id = +new Date();
+
+    const newWindow: Window = {
+      ...APPLICATION_DEFAULTS[window.application],
+      ...window,
+      id,
+      minimized: false,
+      fullScreen: false,
+    };
+
+    setWindows({ ...windows, [id]: newWindow });
+    setActiveWindow(id);
+
+    return id;
   };
 
   const closeWindow = (id: number) => {
@@ -37,8 +69,13 @@ export function App() {
     }
   };
 
-  const setWindowTitle = (id: number, title: string) => {
-    setWindows({ ...windows, [id]: { ...windows[id], title } });
+  const setWindowTitle = (
+    id: number,
+    title: string | ((title: string) => string)
+  ) => {
+    const existingTitle = windows[id].title;
+    const newTitle = typeof title === "string" ? title : title(existingTitle);
+    setWindows({ ...windows, [id]: { ...windows[id], title: newTitle } });
   };
 
   return (
@@ -54,49 +91,29 @@ export function App() {
         setWindowTitle,
       }}
     >
-      <BrowserRouter>
-        <div className="hidden md:block">
-          {/* <Routes>
-            <Route element={<FileExplorer />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/projects" element={<ProjectsPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Route>
-            <Route path="/closed" element={null} />
-          </Routes> */}
-          {Object.values(windows).map((w) => (
-            <DynamicWindow key={w.id} id={w.id} windowState={w} />
-          ))}
+      <div className="hidden sm:block">
+        {Object.values(windows).map((w) => (
+          <DynamicWindow key={w.id} id={w.id} windowState={w} />
+        ))}
+      </div>
+      <div className="sm:hidden">
+        <div className="flex flex-col items-center justify-center  absolute inset-0">
+          <div className="bg-white px-2 py-1">
+            <h1 className="text-xl font-bold">
+              This site is not supported on mobile.
+            </h1>
+            <p className="text-gray-500">
+              Please use a desktop computer to view this site.
+            </p>
+          </div>
         </div>
-        <div className="md:hidden">
-          <Routes>
-            <Route
-              path="*"
-              element={
-                <div className="flex flex-col items-center justify-center  absolute inset-0">
-                  <div className="bg-white px-2 py-1">
-                    <h1 className="text-xl font-bold">
-                      This site is not supported on mobile.
-                    </h1>
-                    <p className="text-gray-500">
-                      Please use a desktop computer to view this site.
-                    </p>
-                  </div>
-                </div>
-              }
-            />
-          </Routes>
-        </div>
-        <Layout />
-      </BrowserRouter>
+      </div>
+      <Desktop />
     </AppContext.Provider>
   );
 }
 
-function Layout() {
-  const { pathname } = useLocation();
+function Desktop() {
   const [activeIcon, setActiveIcon] = useState("");
   const [time, setTime] = useState(
     new Date().toLocaleTimeString(undefined, { timeStyle: "short" })
@@ -120,7 +137,6 @@ function Layout() {
     return () => clearInterval(interval);
   }, []);
 
-  const explorerClosed = pathname === "/closed";
   return (
     <div
       className="h-screen w-full flex flex-col bg-[url(/background.jpg)] bg-no-repeat overflow-hidden"
@@ -133,7 +149,7 @@ function Layout() {
       style={{ backgroundSize: "100% 100%" }}
     >
       <div className="flex items-center flex-wrap gap-4">
-        <div className="hidden md:block">
+        <div className="hidden sm:block">
           <DesktopIcon
             id="my_computer"
             activeIcon={activeIcon}
@@ -142,17 +158,12 @@ function Layout() {
             title="My Computer"
             onClick={() => {
               addWindow({
-                id: +new Date(),
-                minimized: false,
-                fullScreen: false,
-                title: "My Computer",
                 application: "file_explorer",
-                icon: LocalDiskImage,
               });
             }}
           />
         </div>
-        <div className="hidden md:block">
+        <div className="hidden sm:block">
           <DesktopIcon
             id="notepad"
             activeIcon={activeIcon}
@@ -161,12 +172,7 @@ function Layout() {
             title="Notepad"
             onClick={() => {
               addWindow({
-                id: +new Date(),
-                minimized: false,
-                fullScreen: false,
-                title: "Notepad",
                 application: "notepad",
-                icon: NotepadImage,
               });
             }}
           />
@@ -180,6 +186,20 @@ function Layout() {
           title="GitHub Repo"
           onClick={() => {
             window.open("https://github.com/andrewrjohn/windows-xp", "_blank");
+          }}
+        />
+        <DesktopIcon
+          id="txt_file"
+          activeIcon={activeIcon}
+          setActiveIcon={setActiveIcon}
+          icon={TxtImage}
+          title="hello.txt"
+          onClick={() => {
+            addWindow({
+              application: "notepad",
+              defaultText: "Hello, world!",
+              title: "hello.txt",
+            });
           }}
         />
       </div>
@@ -196,37 +216,38 @@ function Layout() {
 
       {/* Task Bar */}
       <div className="z-10 flex items-center via-blue-700 text-white to-blue-500 bg-gradient-to-b from-blue-500">
-        <div className="flex items-center gap-1 bg-gradient-to-b from-green-400 via-green-700 to-green-400 px-1.5 py-0.5 rounded-r-xl text-lg font-semibold italic font-[system-ui] pr-6">
-          <img src={XPImage} className="size-6" />
-          start
-        </div>
-        {explorerClosed ? null : (
-          <div className="ml-3 py-px items-center gap-1 hidden md:flex">
-            {Object.values(windows).map((w) => (
-              <button
-                key={w.id}
-                onClick={() => {
-                  if (activeWindow === w.id) {
-                    setWindowMinimized(w.id, !w.minimized);
-                  } else {
-                    setWindowMinimized(w.id, false);
-                    setActiveWindow(w.id);
-                  }
-                }}
-                className={`flex items-center cursor-pointer capitalize gap-1 px-1.5 rounded-sm text-lg pr-12 tracking-wide ${
-                  w.minimized || activeWindow !== w.id
-                    ? "from-blue-400 via-blue-500 to-blue-400 bg-gradient-to-b"
-                    : "bg-blue-800 border border-blue-900 inset-shadow-2x shadow-2xl shadow-black inset-shadow-black"
-                }`}
-              >
-                <img src={w.icon} className="size-5" />
-                {w.title}
-              </button>
-            ))}
+        <div className="flex overflow-hidden flex-shrink-0 items-center px-1.5 py-0.5 text-lg font-semibold italic font-[system-ui] pr-6 relative">
+          <div className="flex items-center z-10 gap-1">
+            <img src={XPImage} className="size-6" />
+            start
           </div>
-        )}
+          <div className="h-[200%] w-[100%] border-r border-green-800 bg-gradient-to-b  from-green-400 via-green-700 to-green-400 top-1/2 absolute inset-0 -translate-y-1/2 rounded-r-full" />
+        </div>
+        <div className="ml-3 py-px w-full items-center gap-1 hidden sm:flex overflow-hidden">
+          {Object.values(windows).map((w) => (
+            <button
+              key={w.id}
+              onClick={() => {
+                if (activeWindow === w.id) {
+                  setWindowMinimized(w.id, !w.minimized);
+                } else {
+                  setWindowMinimized(w.id, false);
+                  setActiveWindow(w.id);
+                }
+              }}
+              className={`flex items-center min-w-0 cursor-pointer gap-1 px-1.5 rounded-sm text-lg w-full max-w-40 tracking-wide ${
+                w.minimized || activeWindow !== w.id
+                  ? "from-blue-400 via-blue-500 to-blue-400 bg-gradient-to-b"
+                  : "bg-blue-800 border border-blue-900 inset-shadow-2x shadow-2xl shadow-black inset-shadow-black"
+              }`}
+            >
+              <img src={w.icon} className="size-5" />
+              <span className="truncate">{w.title}</span>
+            </button>
+          ))}
+        </div>
         <div className="flex-1" />
-        <div className="flex items-center via-blue-500 gap-2 self-stretch text-white to-blue-400 bg-gradient-to-b from-blue-400 pl-2 pr-5 border-l border-blue-800">
+        <div className="flex items-center flex-shrink-0 via-blue-500 gap-2 whitespace-nowrap self-stretch text-white to-blue-400 bg-gradient-to-b from-blue-400 pl-2 pr-5 border-l border-blue-800">
           <img src={VolumeImage} className="size-4" />
           {time}
         </div>

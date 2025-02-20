@@ -1,6 +1,6 @@
 import FolderImage from "../../../assets/icons/folder.png";
-import { ExplorerGrid } from "../../../ExplorerGrid";
-import { FileExplorerPath } from "../FileExplorerWindow";
+import { FileGrid } from "../../../components/FileGrid";
+import { FileExplorerPath } from "../FileExplorerApplication";
 
 interface Props {
   setPath: (path: FileExplorerPath) => void;
@@ -10,12 +10,11 @@ export function HomePage(props: Props) {
   const { setPath } = props;
 
   return (
-    <ExplorerGrid>
+    <FileGrid>
       <Folder name="About" path="about" setPath={setPath} />
       <Folder name="Projects" path="projects" setPath={setPath} />
-      {/* <Folder name="Email" path="/contact" image={EmailImage} /> */}
       <Folder name="Contact" path="contact" setPath={setPath} />
-    </ExplorerGrid>
+    </FileGrid>
   );
 }
 
