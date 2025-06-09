@@ -1,5 +1,3 @@
-A Windows XP-inspired portfolio website that has too many features.
-
 ### Features
 
 - Dynamic application/window manager
